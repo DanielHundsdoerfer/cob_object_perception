@@ -1,6 +1,6 @@
-#include "texture_features.h"
-#include "color_parameter.h"
-#include "amadasun.h"
+#include "cob_texture_categorization/texture_features.h"
+#include "cob_texture_categorization/color_parameter.h"
+#include "cob_texture_categorization/amadasun.h"
 
 #include <math.h>
 
@@ -1179,7 +1179,7 @@ void texture_features::primitive_size(cv::Mat *img, struct feature_results *resu
 //	Size of Primitives -- Value 8
 	cv::Mat image, image_gray, detected_edges;
 //	Resize input image
-	std::cout<<(*img).size()<<"size "<<(*img).type()<<"type "<<std::endl;
+//	std::cout<<(*img).size()<<"size "<<(*img).type()<<"type "<<std::endl;
 	resize((*img), image, cv::Size(), 0.2, 0.2, cv::INTER_CUBIC);
 
 //	std::cout<<img.size()<<"size "<<img.type()<<"type "<<std::endl;
@@ -1242,7 +1242,7 @@ void texture_features::primitive_size(cv::Mat *img, struct feature_results *resu
 	if(big_comp<1)big_comp=1;
 	if(big_comp>5)big_comp=5;
 	double val8 = (big_comp + avg_size)/2;
-	if(val8!=val8)std::cout<< size<<"size prob"<<std::endl;
+//	if(val8!=val8)std::cout<< size<<"size prob"<<std::endl;
 	(*results).avg_size=val8;
 //	Result Value 8
 
