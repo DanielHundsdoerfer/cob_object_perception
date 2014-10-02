@@ -233,29 +233,36 @@ public:
 		num  = outStream.str();
 
 
-		std::ostringstream outStream2;
-		if(global_imagecount==1)
-		{
-			outStream2 << global_imagecount;
-		}else{
-			outStream2 << global_imagecount-1;
-		}
-		std::string num2;
-		num2  = outStream2.str();
+//		std::ostringstream outStream2;
+//		if(global_imagecount==1)
+//		{
+//			outStream2 << global_imagecount-1;
+//		}else{
+//			outStream2 << global_imagecount;
+//		}
+//		std::string num2;
+//		num2  = outStream2.str();
 //		std::string num = "34";
 //		std::string num2 = "34";
 
+		//Pics out of folder
+//		std::string pcd = "/home/rmb-dh/evaluation/named_scenes/sv"+ num + ".pcd";
+//		std::string jpg = "/home/rmb-dh/evaluation/named_scenes/sv"+ num +".jpg";
+//		//One Pic
+		std::string pcd = "/home/rmb-dh/evaluation/All_images/Table51.pcd";
+		std::string jpg = "/home/rmb-dh/evaluation/All_images/Table51.jpg";
 
-		std::string pcd = "/home/rmb-dh/evaluation/Final2/ev"+ num + ".pcd";
-		std::string jpg = "/home/rmb-dh/evaluation/Final2/ev"+ num +".jpg";
 //		std::string pcd = "/home/rmb-dh/evaluation/test.pcd";
 //		std::string jpg = "/home/rmb-dh/evaluation/test.jpg";
-		std::string segmented = "/home/rmb-dh/evaluation/Segmented/Segmented"+ num2 +".jpg";
-		std::cout<< pcd <<" Used PCD File   "<<jpg<<" Used JPG File"<<std::endl;
+//		std::string segmented = "/home/rmb-dh/evaluation/Segmented/Segmented"+ num2 +".jpg";
+//		std::cout<< pcd <<" Used PCD File   "<<jpg<<" Used JPG File"<<std::endl;
+
+
+
 
 		global_imagecount++;
-		if(global_imagecount==4)
-			global_imagecount=2;
+//		if(global_imagecount==4)
+//			global_imagecount=2;
 
 //		cv::imshow("imagebevore", cv::imread(segmented,1));
 
@@ -267,12 +274,29 @@ public:
 			    PCL_ERROR ("Couldn't read file test_pcd.pcd \n");
 			  }
 			  io::loadPCDFile (pcd, cloud_blob);
-			  color_image = cv::imread(jpg, 1);
+//			  color_image = cv::imread(jpg, 1);
 			  std::cout << "Loaded "
 			            << cloud->width * cloud->height
 			            << " data points from test_pcd.pcd with the following fields: "
 			            << std::endl;
 		}
+
+
+//		////Get original image
+//		cv::Mat orig_img;
+//		orig_img = cv::Mat::zeros(480,640,CV_8UC3);
+////		for(unsigned int i=0; i<(*cloud).height;i++)
+////		{
+//			for(unsigned int j=0; j<(*cloud).width*(*cloud).height;j++)
+//			{
+//				int x = (j)%640;
+//				int y = (int)floor((j)/641);
+//				orig_img.at<cv::Vec3b>(y,x)[0]=(*cloud).points[j].b;
+//				orig_img.at<cv::Vec3b>(y,x)[1]=(*cloud).points[j].g;
+//				orig_img.at<cv::Vec3b>(y,x)[2]=(*cloud).points[j].r;
+//			}
+////		}
+//		cv::imwrite(jpg, orig_img);
 
 
 

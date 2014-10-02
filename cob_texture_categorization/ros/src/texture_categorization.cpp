@@ -76,7 +76,7 @@ node_handle_(nh)
 //	pointcloud_sub_.subscribe(node_handle_, "pointcloud_in", 1);
 
 
-//	segmented_pointcloud_  = nh.subscribe("/surface_classification/segmented_pointcloud", 1, &TextCategorizationNode::segmented_pointcloud_callback, this);
+	segmented_pointcloud_  = nh.subscribe("/surface_classification/segmented_pointcloud", 1, &TextCategorizationNode::segmented_pointcloud_callback, this);
 
 
 //	sync_input_ = new message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::PointCloud2> >(30);
@@ -86,7 +86,7 @@ node_handle_(nh)
 	// database tests
 //	inputCallbackNoCam();
 //	attributeLearningDatabaseTestFarhadi();
-	attributeLearningDatabaseTestCimpoi();
+//	attributeLearningDatabaseTestCimpoi();
 //	attributeLearningDatabaseTestHandcrafted();
 //	attributeLearningDatabaseTestAutomatedClass();
 
@@ -376,11 +376,11 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 			seg_pos_vec.push_back(pos);
 		}
 
-		for(size_t i=0;i<segment_vec.size();i++)
-			{
-				cv::imshow("Ausgabe tiefenbild", segment_vec[i]);
-				cv::waitKey(10000);
-			}
+//		for(size_t i=0;i<segment_vec.size();i++)
+//			{
+//				cv::imshow("Ausgabe tiefenbild", segment_vec[i]);
+//				cv::waitKey(10000);
+//			}
 
 		std::vector<cv::Mat> segment_copy = segment_vec;
 
@@ -453,7 +453,7 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 			std::string num;
 			num  = outStream.str();
 //
-			std::string filename = "/home/rmb-dh/evaluation/segments" +num+".jpg";
+			std::string filename = "/home/rmb-dh/evaluation/3D_Segment_" +num+".jpg";
 			 cv::imwrite(filename, segment_vec[i] );
 		}
 
@@ -512,7 +512,7 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 //						}
 //						std::cout<<"debug2"<<std::endl;
 //						cv::imshow("new",offset_new_segment);
-//						cv::imshow("after trans", segment_copy[i]);
+//						cv::imshow("after ", segment_copy[i]);
 //						std::cout<<"debug3"<<std::endl;
 //						cv::Mat testmat = cv::Mat::zeros(480,640,CV_8UC3);
 //						std::cout<<H_vec[i]<<std::endl;
@@ -570,6 +570,41 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 //		}
 
 
+//		double mergefirstval2 = 2;
+//		double mergesecondval2 = 150;
+//		double splitval2 = 5.1;
+//		double split_int2 = 8;
+//
+//		/// Paramaeteroptimation
+//	    std::cout<<"Want to insert S and M values? Y or N"<<std::endl;
+//	    char change;
+//	    std::cin >> change;
+//	    if(change == 'y' || change == 'Y')
+//	    {
+//	    	double zahl;
+//	    	std::cout<<"Insert Mergefirst. Old val ="<<mergefirstval2<<std::endl;
+//	    	std::cin >> zahl;
+//	    	mergefirstval2 = zahl;
+//	    	std::cout<<"Insert Mergefirst. Old new ="<<mergefirstval2<<std::endl;
+//
+//	    	std::cout<<"Insert Mergesecond. Old val ="<<mergesecondval2<<std::endl;
+//	    	std::cin >> zahl;
+//	    	mergesecondval2 = zahl;
+//	    	std::cout<<"Insert Mergesecond. Old new ="<<mergesecondval2<<std::endl;
+//
+//	    	std::cout<<"Insert splitval. Old val ="<<splitval2<<std::endl;
+//	     	std::cin >> zahl;
+//	    	splitval2 = zahl;
+//	    	std::cout<<"Insert splitval. Old new ="<<splitval2<<std::endl;
+//	    	std::cout<<"Insert splitint. Old val ="<<split_int2<<std::endl;
+//	    	std::cin >> zahl;
+//	    	split_int2 = zahl;
+//	    	std::cout<<"Insert splitint. Old new ="<<split_int2<<std::endl;
+//	    }
+
+
+
+
 		int countsegment=0;
 
 		std::cout<<"Split and Merge"<<std::endl;
@@ -578,14 +613,14 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 		for(size_t i=0; i<segment_vec.size(); i++)
 		{
 			swap_vec.clear();
-			if(segment_vec[i].rows >100 && segment_vec[i].cols>100)
+			if(segment_vec[i].rows >150 && segment_vec[i].cols>150)
 			{
 				splitandmerge seg_step_two = splitandmerge();
 				if(i != (segment_vec.size()-1))
 				{
-					seg_step_two.categorize(segment_vec[i], &swap_vec, 1);
+					seg_step_two.categorize(segment_vec[i], &swap_vec, 1);//, mergefirstval2, mergesecondval2, splitval2, split_int2);
 				}else{
-					seg_step_two.categorize(segment_vec[i], &swap_vec, 2);
+					seg_step_two.categorize(segment_vec[i], &swap_vec, 2);//, mergefirstval2, mergesecondval2, splitval2, split_int2);
 				}
 
 			}else{
@@ -731,29 +766,47 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 
 
 		std::cout<<countsegment<<"countsegemtn "<<retransformed_segment.size()<<"retransseg "<<newvec.size()<<"newsize"<<segment_vec.size()<<"segment_vec size"<<std::endl;
-
 		//Visualisation of Segmentation
 		for(size_t i=0;i<retransformed_segment.size();i++)
 		{
-			int r=0,b=0,g=0;
-			if(i%3==0)
-				r = rand() % 50 + 100;
+			int r=0, g=0, b=0;
+			bool color_diff=false;
+//			do
+//			{
+//				int r=0,b=0,g=0;
+//				if(i%3==0)
+					r = rand() % 255;
+//				if(i%3==1)
+					b = rand() % 255;
+//				if(i%3==2)
+					g = rand() % 255;
 
-			if(i%3==1)
+//	//			cv::cvtColor(orig_img_draw, orig_img_draw, CV_BGR2HSV);
+//
+//				usedcolors[i][0]=r;
+//				usedcolors[i][1]=g;
+//				usedcolors[i][2]=b;
+//				color_diff=false;
+//				for(int j=0;j<i;j++)
+//				{
+//					if(abs((double)usedcolors[i][0]-(double)usedcolors[j][0])<2 && abs((double)usedcolors[i][1]-(double)usedcolors[j][1])<2 && abs((double)usedcolors[i][2]-(double)usedcolors[j][2])<2)
+//						color_diff=true;
+//				}
+//
+//			}while(color_diff);
 
-				b = rand() % 50 +  100;
-
-			if(i%3==2)
-
-				g = rand() % 50+  100;
 			for(int n=0;n<640;n++)
 			{
 				for(int m=0;m<480;m++)
 				{
 					if(retransformed_segment[i].at<cv::Vec3b>(m,n)[0]!=0 || retransformed_segment[i].at<cv::Vec3b>(m,n)[1]!=0 || retransformed_segment[i].at<cv::Vec3b>(m,n)[2]!=0 ){
-						orig_img_draw.at<cv::Vec3b>(m,n)[0]= retransformed_segment[i].at<cv::Vec3b>(m,n)[0]+r;
-						orig_img_draw.at<cv::Vec3b>(m,n)[1]= retransformed_segment[i].at<cv::Vec3b>(m,n)[1]+g;
-						orig_img_draw.at<cv::Vec3b>(m,n)[2]= retransformed_segment[i].at<cv::Vec3b>(m,n)[2]+b;
+
+						orig_img_draw.at<cv::Vec3b>(m,n)[0]= r;
+						orig_img_draw.at<cv::Vec3b>(m,n)[1]= g;
+						orig_img_draw.at<cv::Vec3b>(m,n)[2]= b;
+//						orig_img_draw.at<cv::Vec3b>(m,n)[0]= retransformed_segment[i].at<cv::Vec3b>(m,n)[0]+r;
+//						orig_img_draw.at<cv::Vec3b>(m,n)[1]= retransformed_segment[i].at<cv::Vec3b>(m,n)[1]+g;
+//						orig_img_draw.at<cv::Vec3b>(m,n)[2]= retransformed_segment[i].at<cv::Vec3b>(m,n)[2]+b;
 					}
 				}
 			}
@@ -768,16 +821,16 @@ void TextCategorizationNode::segmented_pointcloud_callback(const cob_surface_cla
 //			}
 //			if(segment_vec.size()>i)
 //			{
-				imshow("segment_vec", retransformed_segment[i]);
+//				imshow("segment_vec", retransformed_segment[i]);
 				std::ostringstream outStream;
 				outStream << i;
 				std::string num;
 				num  = outStream.str();
 //
-				std::string filename = "/home/rmb-dh/evaluation/transformed" +num+".jpg";
+				std::string filename = "/home/rmb-dh/evaluation/Final_Segment_" +num+".jpg";
 				 cv::imwrite(filename, retransformed_segment[i] );
 //			}
-			cv::waitKey(100000);
+//			cv::waitKey(100000);
 		}
 		std::cout<<"Segmentation done"<<std::endl;
 		 cv::imwrite("/home/rmb-dh/evaluation/Segmented.jpg", orig_img_draw );
@@ -1071,20 +1124,81 @@ void TextCategorizationNode::attributeLearningDatabaseTestAutomatedClass()
 void TextCategorizationNode::inputCallbackNoCam()
 {
 
-
+for(int i=1;i<10;i++)
+{
 	//Test Split and merge
 	std::vector<cv::Mat> swap_vec;
-	cv::Mat test1 = cv::imread("/home/rmb-dh/obst.jpg"); //TEST
+//	cv::Mat test1 = cv::imread("/home/rmb-dh/obst.jpg"); //TEST
+
+	std::ostringstream outStream;
+	outStream << i;
+	std::string num;
+	num  = outStream.str();
+
+	std::string path = "/home/rmb-dh/evaluation/All_images/z7.jpg";
+//	std::string path = "/home/rmb-dh/strasse.jpg";
+	cv::Mat test1 = cv::imread(path);
 
 	splitandmerge seg_step_two = splitandmerge();
-	seg_step_two.categorize(test1, &swap_vec, 0);
+	seg_step_two.categorize(test1, &swap_vec, 1);
 
 
-	for(unsigned int ne=0;ne<swap_vec.size();ne++)
-	{
-		cv::imshow("orig",swap_vec[ne]);
-		cv::waitKey(10000);
-	}
+//	for(unsigned int ne=0;ne<swap_vec.size();ne++)
+//	{
+//		cv::imshow("orig",swap_vec[ne]);
+//		cv::waitKey(10000);
+//	}
+
+
+	for(size_t i=0;i<swap_vec.size();i++)
+			{
+				int r=0, g=0, b=0;
+				bool color_diff=false;
+	//			do
+	//			{
+	//				int r=0,b=0,g=0;
+	//				if(i%3==0)
+						r = rand() % 255;
+	//				if(i%3==1)
+						b = rand() % 255;
+	//				if(i%3==2)
+						g = rand() % 255;
+
+	//	//			cv::cvtColor(orig_img_draw, orig_img_draw, CV_BGR2HSV);
+	//
+	//				usedcolors[i][0]=r;
+	//				usedcolors[i][1]=g;
+	//				usedcolors[i][2]=b;
+	//				color_diff=false;
+	//				for(int j=0;j<i;j++)
+	//				{
+	//					if(abs((double)usedcolors[i][0]-(double)usedcolors[j][0])<2 && abs((double)usedcolors[i][1]-(double)usedcolors[j][1])<2 && abs((double)usedcolors[i][2]-(double)usedcolors[j][2])<2)
+	//						color_diff=true;
+	//				}
+	//
+	//			}while(color_diff);
+
+				for(int n=0;n<640;n++)
+				{
+					for(int m=0;m<480;m++)
+					{
+						if(swap_vec[i].at<cv::Vec3b>(m,n)[0]!=0 || swap_vec[i].at<cv::Vec3b>(m,n)[1]!=0 || swap_vec[i].at<cv::Vec3b>(m,n)[2]!=0 ){
+
+							test1.at<cv::Vec3b>(m,n)[0]= r;
+							test1.at<cv::Vec3b>(m,n)[1]= g;
+							test1.at<cv::Vec3b>(m,n)[2]= b;
+	//						orig_img_draw.at<cv::Vec3b>(m,n)[0]= retransformed_segment[i].at<cv::Vec3b>(m,n)[0]+r;
+	//						orig_img_draw.at<cv::Vec3b>(m,n)[1]= retransformed_segment[i].at<cv::Vec3b>(m,n)[1]+g;
+	//						orig_img_draw.at<cv::Vec3b>(m,n)[2]= retransformed_segment[i].at<cv::Vec3b>(m,n)[2]+b;
+						}
+					}
+				}
+
+			}
+
+	cv::imshow("Segments",test1);
+	cv::waitKey(100000);
+}
 
 
 	//	cv::imshow("swap", swap_vec[j]);
@@ -1098,8 +1212,8 @@ void TextCategorizationNode::inputCallbackNoCam()
 
 //	std::string path_traindata = "/media/SAMSUNG/rmb/datasetTextur/A_Klassification_Data/train_data/";			//Pfad zu Trainingsdaten
 //	std::string path_testdata = "/media/SAMSUNG/rmb/datasetTextur/A_Klassification_Data/test_data/";			//Pfad zu Testdaten
-	std::string path_database = "/media/SAMSUNG/rmb/datasetTextur/texture_database/";							// path to database
-	std::string path_save_location = "/media/SAMSUNG/rmb/datasetTextur/feature_files/";		//Pfad zu Speicherort der Featurevektoren
+//	std::string path_database = "/media/SAMSUNG/rmb/datasetTextur/texture_database/";							// path to database
+//	std::string path_save_location = "/media/SAMSUNG/rmb/datasetTextur/feature_files/";		//Pfad zu Speicherort der Featurevektoren
 
 //	create_train_data testdata = create_train_data();									// Berechnet den Featurevektor und den einen Labelvektor zum Testen
 //	testdata.compute_data(path_testdata, path_save_location, 146, 2);

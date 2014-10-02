@@ -163,11 +163,11 @@ void color_parameter::get_color_parameter(cv::Mat img, struct feature_results *r
 		dom_color2 = 0;
 	}
 
-	for(size_t i=0;i<hue_hist.size();i++)
-	{
-		std::cout<<hue_hist[i]<<"  ";
-	}
-	std::cout<<std::endl;
+//	for(size_t i=0;i<hue_hist.size();i++)
+//	{
+//		std::cout<<hue_hist[i]<<"  ";
+//	}
+//	std::cout<<std::endl;
 	//colorfulness
 	int amount_of_color=0;
 
@@ -198,7 +198,7 @@ void color_parameter::get_color_parameter(cv::Mat img, struct feature_results *r
 	if(dom_color2<1)dom_color2=1;
 	if(dom_color2>10)dom_color2=10;
 	if(dom_color==1 && dom_color2==1) dom_color2=1.5;
-	std::cout<<dom_color<<" "<<dom_color2<<std::endl;
+//	std::cout<<dom_color<<" "<<dom_color2<<std::endl;
 
 
 	colorfulness = amount_of_color;
@@ -338,20 +338,23 @@ void color_parameter::get_color_parameter(cv::Mat img, struct feature_results *r
 //  all relevant pixels
 
 //  adopted measurement
-	cv::Scalar means, stds, meanv, stdv;
-	double s_mean, s_std, v_mean, v_std;
+	cv::Scalar means, stds, meanv, stdv, meanh, stdh;
+	double s_mean, s_std, v_mean, v_std, h_mean, h_std;
 	double s_mean_raw, s_std_raw, v_mean_raw, v_std_raw;
-	std::vector<double> s, v;
+	std::vector<double> s, v, h;
 	for(int i=0;i<hsv.rows;i++)
 	{
 		for(int j=0;j<hsv.cols;j++)
 		{
+			double val_h = hsv.at<cv::Vec3b>(i,j)[0];
 			double val_s = hsv.at<cv::Vec3b>(i,j)[1];
 			double val_v = hsv.at<cv::Vec3b>(i,j)[2];
 			s.push_back(val_s/255);
 			v.push_back(val_v/255);
+			h.push_back(val_h/180);
 		}
 	}
+	cv::meanStdDev(h, meanh, stdh);
 	cv::meanStdDev(s, means, stds);
 	cv::meanStdDev(v, meanv, stdv);
 	s_mean = means.val[0]*6+0.5;
@@ -362,6 +365,9 @@ void color_parameter::get_color_parameter(cv::Mat img, struct feature_results *r
 	v_mean_raw = meanv.val[0];
 	v_std = stdv.val[0]*12+0.5;
 	v_std_raw = stdv.val[0];
+
+	h_mean = meanh.val[0]*6+0.5;
+	h_std = stdh.val[0]*10+0.5;
 
 	if(s_mean>1)
 	{
@@ -403,6 +409,9 @@ void color_parameter::get_color_parameter(cv::Mat img, struct feature_results *r
 	(*results).colorfulness = colorfulness;
 	(*results).dom_color = dom_color;
 	(*results).dom_color2 = dom_color2;
+//	(*results).dom_color = h_mean;
+//	(*results).dom_color2 = h_std;
+
 //		(*results).dom_color = 1;
 //		(*results).dom_color2 = 2;
 
